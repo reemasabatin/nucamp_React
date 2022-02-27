@@ -14,8 +14,9 @@ class Bootcamp{
         this.students=students;
     }
 //Task 2
+
 registerStudent(studentToRegister) {
-  if (this.students.filter (s => s.email === studentToRegister.email).length) {
+  if (this.students.filter(s => s.email === studentToRegister.email).length) {
       console.log(`${studentToRegister.name} is already registered`)
   } else {
       this.students.push(studentToRegister)
@@ -25,8 +26,11 @@ registerStudent(studentToRegister) {
     }
 }
 
+
 const webDevFundamentals= new Bootcamp ("Web Development Fundamentals","Beginner");
 const Reema= new Student ("Reema", "rm.email", "Philippines")
 const Reema1= new Student ("Reema", "rm.email", "Philippines")
 webDevFundamentals.registerStudent(Reema)
 webDevFundamentals.registerStudent(Reema1)
+
+
