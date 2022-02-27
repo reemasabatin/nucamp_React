@@ -1,3 +1,4 @@
+// Task1
 class Student{
     constructor(name, email,community){
         this.name= name;
@@ -10,11 +11,11 @@ class Bootcamp{
     constructor(name,level,students=[]){
         this.name= name;
         this.level= level;
-        this.student=students;
+        this.students=students;
     }
-
+//Task 2
 registerStudent(studentToRegister) {
-  if (this.students.filter(s => s.email === studentToRegister.email).length) {
+  if (this.students.filter (s => s.email === studentToRegister.email).length) {
       console.log(`${studentToRegister.name} is already registered`)
   } else {
       this.students.push(studentToRegister)
@@ -24,8 +25,8 @@ registerStudent(studentToRegister) {
     }
 }
 
-const bootcampWeb= new Bootcamp ("Web Development Fundamentals","Beginner");
+const webDevFundamentals= new Bootcamp ("Web Development Fundamentals","Beginner");
 const Reema= new Student ("Reema", "rm.email", "Philippines")
 const Reema1= new Student ("Reema", "rm.email", "Philippines")
-bootcampWeb.registerStudent(Reema)
-bootcampWeb.registerStudent(Reema1)
+webDevFundamentals.registerStudent(Reema)
+webDevFundamentals.registerStudent(Reema1)
