@@ -1,46 +1,74 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import Directory from './DirectoryComponent';
 import CampsiteInfo from './CampsiteInfoComponent';
 import Header from './HeaderComponent';
 import Footer from './FooterComponent';
 import Home from './HomeComponent';
-import About from './AboutComponent'; //---------------Task 1
 import Contact from './ContactComponent';
-import {postComment, fetchCampsites, fetchComments, fetchPromotions} from '../redux/ActionCreators';
-import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
+import About from './AboutComponent';
+import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
+import {connect} from 'react-redux';
 import {actions} from 'react-redux-form';
+import {
+  postComment,
+  fetchCampsites,
+  fetchComments,
+  fetchPromotions,
+  fetchPartners,
+  postFeedback,
+} from '../redux/ActionCreators';
 import {TransitionGroup, CSSTransition} from 'react-transition-group';
 
-
-
+/**
+ *
+ * Allows redux state to be accessible from props
+ */
 const mapStateToProps = state => {
-    return {
-        campsites: state.campsites,
-        comments: state.comments,
-        partners: state.partners,
-        promotions: state.promotions
-    };
+  return {
+    campsites: state.campsites,
+    comments: state.comments,
+    partners: state.partners,
+    promotions: state.promotions,
+  };
 };
 
+/**
+ * Allows redux dispatch functions to be accessible from props
+ */
 const mapDispatchToProps = {
-  addComment: (campsiteId, rating, author, text) => addComment(campsiteId, rating, author, text),
   postComment: (campsiteId, rating, author, text) => postComment(campsiteId, rating, author, text),
   fetchCampsites: () => fetchCampsites(),
   resetFeedbackForm: () => actions.reset('feedbackForm'),
   fetchComments: () => fetchComments(),
   fetchPromotions: () => fetchPromotions(),
+  fetchPartners: () => fetchPartners(),
+  postFeedback: (firstName, lastName, phoneNum, email, agree, contactType, message) =>
+    postFeedback(firstName, lastName, phoneNum, email, agree, contactType, message),
 };
 
+/**
+ * Main component
+ */
 
 class Main extends Component {
-
+  /**
+   * Fetches data on first mount of Main
+   * Redux dispatch functions
+   */
   componentDidMount() {
     this.props.fetchCampsites();
     this.props.fetchComments();
     this.props.fetchPromotions();
+    this.props.fetchPartners();
   }
 
+  /**
+   * Renders Home component.
+   * Passes props from redux:
+   * Filtered for data with Featured property
+   * Loading and Err for each: campsites, partners, promotions
+   * Passed with Route "/home"
+   */
   render() {
     const HomePage = () => {
       return (
@@ -48,14 +76,22 @@ class Main extends Component {
           campsite={this.props.campsites.campsites.filter(campsite => campsite.featured)[0]}
           campsitesLoading={this.props.campsites.isLoading}
           campsitesErrMess={this.props.campsites.errMess}
+          partner={this.props.partners.partners.filter(partner => partner.featured)[0]}
+          partnersLoading={this.props.partners.isLoading}
+          partnersErrMess={this.props.partners.errMess}
           promotion={this.props.promotions.promotions.filter(promotion => promotion.featured)[0]}
           promotionLoading={this.props.promotions.isLoading}
           promotionErrMess={this.props.promotions.errMess}
-          partner={this.props.partners.filter(partner => partner.featured)[0]}
         />
       );
     };
 
+    /**
+     *
+     * @param {campsite ID} match
+     * Assigns current Campsite data to be displayed to the same ID as selected by user.
+     * Passed with route "/directory/:campsiteId"
+     */
     const CampsiteWithId = ({match}) => {
       return (
         <CampsiteInfo
@@ -75,13 +111,19 @@ class Main extends Component {
       );
     };
 
-    //-------Task 1 route about us
-
+    /**
+     * Default layout of components on mount
+     * Header and Footer components remain fixed (does not route)
+     */
     return (
       <div>
         <Header />
         <TransitionGroup>
+          {/* Slight pop-in animation wrapper */}
           <CSSTransition key={this.props.location.key} classNames="page" timeout={300}>
+            {/**
+             *Redux Router
+             */}
             <Switch>
               <Route path="/home" component={HomePage} />
               <Route
@@ -92,14 +134,20 @@ class Main extends Component {
               <Route path="/directory/:campsiteId" component={CampsiteWithId} />
               <Route
                 exact
-                path="/contactus"
-                render={() => <Contact resetFeedbackForm={this.props.resetFeedbackForm} />}
-              />
-              <Route
-                exact
                 path="/aboutus"
                 render={() => <About partners={this.props.partners} />}
               />
+              <Route
+                exact
+                path="/contactus"
+                render={() => (
+                  <Contact
+                    resetFeedbackForm={this.props.resetFeedbackForm}
+                    postFeedback={this.props.postFeedback}
+                  />
+                )}
+              />
+              {/* Reroutes path "/" to "/home" */}
               <Redirect to="/home" />
             </Switch>
           </CSSTransition>
